@@ -20,9 +20,9 @@ import static java.lang.String.valueOf;
  * @description: TODO
  * @date 2019/11/25 11:02
  */
-public class CGLibRunner<T extends ChangeListenerAbstract> {
+public class CGLibRunner<T> {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
 
         Person person = (Person) new CGLibRunner().createProxy(Person.class);
 
@@ -36,13 +36,10 @@ public class CGLibRunner<T extends ChangeListenerAbstract> {
     public T createProxy(Class<T> clazz) {
         Enhancer enhancer = new Enhancer();
         MethodInterceptor methodInterceptor = new PublishingPropertyEventMethodInterceptor();
-        enhancer.setSuperclass(clazz);
-        enhancer.setCallback(methodInterceptor);
-        T enhancedBean = (T)enhancer.create();
-        if (enhancedBean instanceof ChangeListenerAbstract){
-            ChangeListenerAbstract listenerAbstract = enhancedBean;
+        if (methodInterceptor instanceof PublishingPropertyEventMethodInterceptor){
+            PublishingPropertyEventMethodInterceptor interceptor = (PublishingPropertyEventMethodInterceptor)methodInterceptor;
             // 添加 PropertyChangeListener
-            listenerAbstract.addPropertyChangeListener(event -> {
+            interceptor.addPropertyChangeListener(event -> {
                 // 属性变化通知事件
                 System.out.printf("监听到属性[%s] 内容变化（事件来源：%s），老值：%s，新值：%s\n",
                         event.getPropertyName(),
@@ -53,7 +50,7 @@ public class CGLibRunner<T extends ChangeListenerAbstract> {
             });
 
             // 添加 VetoableChangeListener
-            listenerAbstract.addVetoableChangeListener(event -> {
+            interceptor.addVetoableChangeListener(event -> {
                 String newValue = valueOf(event.getNewValue());
                 if (isNumeric(newValue)) {
                     throw new PropertyVetoException(
@@ -61,6 +58,9 @@ public class CGLibRunner<T extends ChangeListenerAbstract> {
                 }
             });
         }
+        enhancer.setSuperclass(clazz);
+        enhancer.setCallback(methodInterceptor);
+        T enhancedBean = (T)enhancer.create();
         return enhancedBean;
     }
 

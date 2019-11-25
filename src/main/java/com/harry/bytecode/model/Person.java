@@ -1,7 +1,5 @@
 package com.harry.bytecode.model;
 
-import com.harry.bytecode.cglib.ChangeListenerAbstract;
-
 import java.util.Date;
 
 /**
@@ -11,7 +9,7 @@ import java.util.Date;
  * @description: TODO
  * @date 2019/11/25 10:28
  */
-public class Person extends ChangeListenerAbstract {
+public class Person {
 
     private Long id;
 

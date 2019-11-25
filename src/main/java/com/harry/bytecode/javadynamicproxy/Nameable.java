@@ -1,6 +1,7 @@
 package com.harry.bytecode.javadynamicproxy;
 
 /**
+ * java 动态代理接口
  * @author zhouhong
  * @version 1.0
  * @title: Nameable
